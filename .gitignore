@@ -3,3 +3,4 @@ install
 dist
 serviceAccountKey.json
 .wireit
+.mdicon

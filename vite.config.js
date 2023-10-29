@@ -3,7 +3,7 @@ import {defineConfig} from 'vite';
 // import {minify as minifyHtml} from 'html-minifier-terser';
 // import minifyLiterals from 'rollup-plugin-minify-template-literals';
 // import {VitePWA} from 'vite-plugin-pwa';
-// import {mdIconLocalize} from 'rollup-plugin-md-icon-localize';
+import {mdIconLocalize} from 'rollup-plugin-md-icon-localize';
 
 const DEV = process.env.NODE_ENV == 'development';
 
@@ -31,24 +31,24 @@ export default defineConfig({
 	//     hmr: false,
 	//   },
 	build: {
-		// outDir: 'docs',
+		outDir: 'docs',
 		assetsInlineLimit: 6000,
-		// emptyOutDir: false,
+		emptyOutDir: false,
 	},
 	esbuild: {
 		legalComments: 'external',
 	},
 	plugins: [
-		...(!DEV ? [minifyLiterals()] : []),
+		// ...(!DEV ? [minifyLiterals()] : []),
 
-		...(!DEV ? [minify] : []),
+		// ...(!DEV ? [minify] : []),
 
-		// mdIconLocalize({
-		// 	include: [
-		// 		'./src/**/*.ts',
-		// 		'./node_modules/@vdegenne/material-color-helpers/lib/elements/**/*.js',
-		// 	],
-		// }),
+		mdIconLocalize({
+			include: [
+				'./src/**/*.ts',
+				'./node_modules/@vdegenne/material-color-helpers/lib/elements/**/*.js',
+			],
+		}),
 
 		// ...(!DEV
 		// 	? [

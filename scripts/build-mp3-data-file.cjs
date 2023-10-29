@@ -12,7 +12,7 @@ function getMP3Locations(rootPath) {
 
 		if (mp3Files.length > 0) {
 			const location = {
-				path: currentPath.split(path.sep),
+				path: path.relative(rootPath, currentPath).split(path.sep),
 				files: mp3Files,
 			};
 			items.push(location);
@@ -34,4 +34,5 @@ function getMP3Locations(rootPath) {
 
 const directoryPath = path.join('docs', 'files'); // Replace with the path to your "docs" directory
 const result = getMP3Locations(directoryPath);
-console.log(result);
+fs.writeFileSync(path.join('docs', 'mp3.json'), JSON.stringify(result));
+fs.writeFileSync(path.join('public', 'mp3.json'), JSON.stringify(result));

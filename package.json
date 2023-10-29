@@ -1,5 +1,5 @@
 {
-	"name": "%project%",
+	"name": "mp3",
 	"version": "1.0.0",
 	"description": "",
 	"main": "",
@@ -13,13 +13,30 @@
 	},
 	"scripts": {
 		"preinstall": "node --no-warnings install/install.cjs",
-		"dev": "rm -rf node_modules/.vite && vite --host",
+		"dev": "wireit",
 		"build-mp3": "wireit",
 		"build": "vite build"
 	},
 	"wireit": {
 		"build-mp3": {
-			"command": "node ./scripts/build-mp3-data-file.cjs"
+			"command": "node ./scripts/build-mp3-data-file.cjs",
+			"files": [
+				"docs/files/**/*.mp3",
+				"scripts/build-mp3-data-file.cjs"
+			],
+			"output": [
+				"docs/mp3.json",
+				"public/mp3.json"
+			]
+		},
+		"dev": {
+			"command": "vite --host",
+			"output": [
+				"node_modules/.vite"
+			],
+			"dependencies": [
+				"build-mp3"
+			]
 		}
 	},
 	"devDependencies": {

@@ -1,3 +1,5 @@
+import { themeStore } from "./styles/styles.js";
+
 window.addEventListener('keydown', (e) => {
 	if (e.altKey || e.ctrlKey) {
 		return;
@@ -7,6 +9,6 @@ window.addEventListener('keydown', (e) => {
 		return;
 	}
 	if (e.key === 'd') {
-		// themeStore.toggleMode();
+		themeStore.toggleMode();
 	}
 });
