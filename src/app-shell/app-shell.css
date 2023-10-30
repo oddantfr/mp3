@@ -12,6 +12,10 @@
 	background-color: var(--md-sys-color-outline);
 	color: var(--md-sys-color-on-primary);
 	/* padding: 2px 4px; */
+
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 header {
