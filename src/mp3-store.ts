@@ -81,6 +81,13 @@ class Mp3Store extends ReactiveController {
 		}
 	}
 
+	pickRandomIndex() {
+		if (this.mp3dir) {
+			this.mp3dir.index = Math.floor(Math.random() * this.mp3dir.files.length);
+			this.requestUpdate('mp3dir');
+		}
+	}
+
 	constructor() {
 		super();
 		fetchData().then((data) => {

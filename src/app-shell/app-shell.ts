@@ -58,7 +58,7 @@ export class AppShell extends LitElement {
 						${
 							mp3Store.mp3dir
 								? html`
-										<div style="transform:scale(2)">
+										<div style="">
 											<div class="flex items-center">
 												<md-icon-button
 													touch-target="wrapper"
@@ -82,6 +82,12 @@ export class AppShell extends LitElement {
 												@click=${() => mp3Store.playAudio()}
 											>
 												<md-icon>volume_up</md-icon>
+											</md-icon-button>
+											<md-icon-button
+												touch-target="wrapper"
+												@click=${() => mp3Store.pickRandomIndex()}
+											>
+												<md-icon>casino</md-icon>
 											</md-icon-button>
 										</div>
 								  `
