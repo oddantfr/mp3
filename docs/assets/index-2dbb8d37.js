@@ -63,7 +63,7 @@ var Pr=(r,t,e)=>{if(!t.has(r))throw TypeError("Cannot "+e)};var rt=(r,t,e)=>(Pr(
 							class="absolute inset-0 flex flex-col justify-center items-center"
 						>
 						${D.mp3dir?O`
-										<div>
+										<div style="transform:scale(2)">
 											<div class="flex items-center">
 												<md-icon-button
 													touch-target="wrapper"

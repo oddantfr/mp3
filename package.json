@@ -32,7 +32,8 @@
 		"build": {
 			"command": "vite build",
 			"output": [
-				"docs/assets/index-*.js"
+				"docs/**/*",
+				"!docs/files"
 			],
 			"dependencies": [
 				"build-mp3"

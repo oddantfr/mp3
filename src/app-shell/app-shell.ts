@@ -58,7 +58,7 @@ export class AppShell extends LitElement {
 						${
 							mp3Store.mp3dir
 								? html`
-										<div>
+										<div style="transform:scale(2)">
 											<div class="flex items-center">
 												<md-icon-button
 													touch-target="wrapper"
