@@ -5,6 +5,7 @@ import {AppShell} from './app-shell/app-shell.js';
 import './global-events.js';
 import './material.js';
 import './mp3-store.js';
+import './router.js';
 
 export const app = new AppShell();
 
