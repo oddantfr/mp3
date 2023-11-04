@@ -1,12 +1,11 @@
-import {LitElement, html, nothing} from 'lit';
+import {LitElement, html} from 'lit';
 import {customElement} from 'lit/decorators.js';
 import {withStyles} from 'lit-with-styles';
-import {appState} from '../app-state.js';
 import styles from './app-shell.css?inline';
 import '@material/mwc-top-app-bar';
 import {mp3Store} from '../mp3-store.js';
 import {withController} from '@snar/lit';
-import { settingsDialog } from '../settings-dialog/settings-dialog.js';
+import {settingsDialog} from '../settings-dialog/settings-dialog.js';
 
 @customElement('app-shell')
 @withStyles(styles)
@@ -15,16 +14,16 @@ import { settingsDialog } from '../settings-dialog/settings-dialog.js';
 export class AppShell extends LitElement {
 	render() {
 		return html`
-					<div id="path" class="py-2 px-3">
-						/${decodeURIComponent(mp3Store.cwd.join('/'))}
-					</div>
-		<header>
-				<span>${mp3Store.cwd[mp3Store.cwd.length - 1] ?? 'root'}</span>
+				<div id="path" class="py-2 px-3">
+					/${decodeURIComponent(mp3Store.cwd.join('/'))}
+				</div>
+				<header>
+					<span>${mp3Store.cwd[mp3Store.cwd.length - 1] ?? 'root'}</span>
 
-				<md-icon-button @click=${() => settingsDialog.open = true}>
-					<md-icon>settings</md-icon>
-				</md-icon-button>
-			</header>
+					<md-icon-button @click=${() => (settingsDialog.open = true)}>
+						<md-icon>settings</md-icon>
+					</md-icon-button>
+				</header>
 				<div class="flex-1 flex flex-col">
 
 					<md-list>
@@ -40,7 +39,7 @@ export class AppShell extends LitElement {
 							return html`
 								<md-list-item
 									type="button"
-									@click=${(event: PointerEvent) => {
+									@click=${() => {
 										mp3Store.enter(item);
 									}}
 								>
