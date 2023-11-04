@@ -6,6 +6,7 @@ import styles from './app-shell.css?inline';
 import '@material/mwc-top-app-bar';
 import {mp3Store} from '../mp3-store.js';
 import {withController} from '@snar/lit';
+import { settingsDialog } from '../settings-dialog/settings-dialog.js';
 
 @customElement('app-shell')
 @withStyles(styles)
@@ -14,13 +15,17 @@ import {withController} from '@snar/lit';
 export class AppShell extends LitElement {
 	render() {
 		return html`
-		<header>
-				<span>${mp3Store.cwd[mp3Store.cwd.length - 1] ?? 'root'}</span>
-			</header>
-				<div class="flex-1 flex flex-col">
 					<div id="path" class="py-2 px-3">
 						/${decodeURIComponent(mp3Store.cwd.join('/'))}
 					</div>
+		<header>
+				<span>${mp3Store.cwd[mp3Store.cwd.length - 1] ?? 'root'}</span>
+
+				<md-icon-button @click=${() => settingsDialog.open = true}>
+					<md-icon>settings</md-icon>
+				</md-icon-button>
+			</header>
+				<div class="flex-1 flex flex-col">
 
 					<md-list>
 						<md-list-item

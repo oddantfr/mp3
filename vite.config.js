@@ -4,6 +4,7 @@ import {defineConfig} from 'vite';
 // import minifyLiterals from 'rollup-plugin-minify-template-literals';
 // import {VitePWA} from 'vite-plugin-pwa';
 import {mdIconLocalize} from 'rollup-plugin-md-icon-localize';
+import {materialAll} from 'rollup-plugin-material-all';
 
 const DEV = process.env.NODE_ENV == 'development';
 
@@ -27,9 +28,15 @@ const minify = {
 
 export default defineConfig({
 	base: './',
-	//   server: {
-	//     hmr: false,
-	//   },
+	server: {
+		proxy: {
+			'/files': {
+				target: 'http://localhost:5173',
+				rewrite: (path) => `/docs/${path}`,
+			},
+		},
+		// hmr: false,
+	},
 	build: {
 		outDir: 'docs',
 		assetsInlineLimit: 6000,
@@ -42,6 +49,8 @@ export default defineConfig({
 		// ...(!DEV ? [minifyLiterals()] : []),
 
 		// ...(!DEV ? [minify] : []),
+
+		DEV ? {} : materialAll(),
 
 		mdIconLocalize({
 			include: [

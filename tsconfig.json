@@ -14,7 +14,7 @@
 		"experimentalDecorators": true,
 		"outDir": "lib",
 		"rootDir": "src",
-		"types": ["lit", "lit/decorators.js", "vite/client"]
+		"types": ["lit", "lit/decorators.js", "vite/client", "@material/web/all.js"]
 	},
 	"include": ["src/**/*"],
 	"exclude": []
