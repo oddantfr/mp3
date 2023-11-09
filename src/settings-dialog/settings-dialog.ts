@@ -6,10 +6,14 @@ import {
 	renderColorPicker,
 	renderThemeElements,
 } from '../styles/theme-elements.js';
-import { withStyles } from 'lit-with-styles';
+import {withStyles} from 'lit-with-styles';
+import {themeStore} from '../styles/styles.js';
+import {withController} from '@snar/lit';
 
 @customElement({name: 'settings-dialog', inject: true})
 @withStyles()
+// @ts-ignore
+@withController(themeStore)
 export class SettingsDialog extends LitElement {
 	@state() open = false;
 

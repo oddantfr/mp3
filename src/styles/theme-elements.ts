@@ -27,7 +27,7 @@ export function renderColorModePicker() {
 export function renderColorPicker() {
 	return html`
 		<color-picker
-			.value=${themeStore.themeColor}
+			value=${themeStore.themeColor}
 			@input=${(event: Event) => {
 				const target = event.target as ColorPicker;
 				themeStore.themeColor = target.value;

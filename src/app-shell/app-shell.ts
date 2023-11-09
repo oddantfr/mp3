@@ -6,6 +6,7 @@ import '@material/mwc-top-app-bar';
 import {mp3Store} from '../mp3-store.js';
 import {withController} from '@snar/lit';
 import {settingsDialog} from '../settings-dialog/settings-dialog.js';
+import {playerUI} from '../player/player-ui.js';
 
 @customElement('app-shell')
 @withStyles(styles)
@@ -20,6 +21,11 @@ export class AppShell extends LitElement {
 				<header>
 					<span>${mp3Store.cwd[mp3Store.cwd.length - 1] ?? 'root'}</span>
 
+					<div class="flex-1"></div>
+
+					<md-icon-button @click=${() => (playerUI.open = true)}>
+						<md-icon>play_arrow</md-icon>
+					</md-icon-button>
 					<md-icon-button @click=${() => (settingsDialog.open = true)}>
 						<md-icon>settings</md-icon>
 					</md-icon-button>
@@ -29,7 +35,7 @@ export class AppShell extends LitElement {
 					<md-list>
 						<md-list-item
 							type="button"
-							@click=${(event: PointerEvent) => {
+							@click=${() => {
 								mp3Store.goUp();
 							}}
 						>
@@ -44,7 +50,7 @@ export class AppShell extends LitElement {
 									}}
 								>
 									<md-icon slot="start">folder</md-icon>
-									<div slot="headline">${item}</div>
+									<div slot="headline"></div>${item}</div>
 								</md-list-item>
 							`;
 						})}

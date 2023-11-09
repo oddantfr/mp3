@@ -1,6 +1,7 @@
 import {ReactiveController} from '@snar/lit';
 import {PropertyValueMap, PropertyValues, state} from 'snar';
 import {saveToLocalStorage} from 'snar-save-to-local-storage';
+import {playAudio} from './audio.js';
 
 export type Mp3Item = {path: string[]; files: string[]; index: number};
 export type Mp3Data = Mp3Item[];
@@ -54,13 +55,15 @@ class Mp3Store extends ReactiveController {
 		}
 	}
 
-	playAudio() {
+	async playAudio() {
 		if (this.mp3dir) {
-			new Audio(
+			await playAudio(
 				`./files/${this.mp3dir.path.join('/')}/${
 					this.mp3dir.files[this.mp3dir.index]
-				}`
-			).play();
+				}`,
+
+				1
+			);
 		}
 	}
 
