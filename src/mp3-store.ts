@@ -29,13 +29,9 @@ class Mp3Store extends ReactiveController {
 				...new Set(matching.map((item) => item.path[this.cwd.length])),
 			];
 
-			const mp3Dir = this.data.find((item) => {
-				console.log(cwd, item.path.join('/'));
-				return item.path.join('/') === cwd;
-			});
+			const mp3Dir = this.data.find((item) => item.path.join('/') === cwd);
 
 			this.mp3dir = mp3Dir || null;
-			console.log(this.mp3dir);
 		}
 	}
 
@@ -55,30 +51,27 @@ class Mp3Store extends ReactiveController {
 		}
 	}
 
-	async playAudio() {
-		if (this.mp3dir) {
+	async playAudio(dir = this.mp3dir) {
+		if (dir) {
 			await playAudio(
-				`./files/${this.mp3dir.path.join('/')}/${
-					this.mp3dir.files[this.mp3dir.index]
-				}`,
-
+				`./files/${dir.path.join('/')}/${dir.files[dir.index]}`,
 				1
 			);
 		}
 	}
 
-	previousAudioIndex() {
-		if (this.mp3dir) {
-			if (this.mp3dir.index > 0) {
-				this.mp3dir.index--;
+	previousAudioIndex(dir = this.mp3dir) {
+		if (dir) {
+			if (dir.index > 0) {
+				dir.index--;
 				this.requestUpdate('mp3dir');
 			}
 		}
 	}
-	nextAudioIndex() {
-		if (this.mp3dir) {
-			if (this.mp3dir.index < this.mp3dir.files.length) {
-				this.mp3dir.index++;
+	nextAudioIndex(dir = this.mp3dir) {
+		if (dir) {
+			if (dir.index < dir.files.length) {
+				dir.index++;
 				this.requestUpdate('mp3dir');
 			}
 		}
@@ -91,22 +84,43 @@ class Mp3Store extends ReactiveController {
 		}
 	}
 
+	async getTreeFromPath(path: string, recursive = true) {
+		await this.fetchComplete;
+		const tree = [];
+		if (recursive) {
+			tree.push(
+				...this.data.filter((item) => item.path.join('/').startsWith(path))
+			);
+		} else {
+			// If that's a project
+			const root = this.data.find((item) => item.path.join('/') === path);
+			if (root) {
+				tree.push(root);
+			}
+		}
+		return tree;
+	}
+
+	#fetchCompletePromise;
+	get fetchComplete() {
+		return this.#fetchCompletePromise;
+	}
+
 	constructor() {
 		super();
-		fetchData().then((data) => {
+		this.#fetchCompletePromise = fetchData().then((data) => {
 			this.data = data;
 			this.data.forEach((item) => (item.index = 0));
 			this.requestUpdate('cwd');
 			// console.log(this.data);
+			return data;
 		});
 	}
 }
 
 export const mp3Store = new Mp3Store();
 
-async function fetchData() {
-	try {
-		const r = await fetch('./mp3.json');
-		return await r.json();
-	} catch (e) {}
+async function fetchData(): Promise<Mp3Data> {
+	const r = await fetch('./mp3.json');
+	return await r.json();
 }

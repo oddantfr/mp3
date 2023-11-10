@@ -2,7 +2,8 @@ import {ReactiveController} from '@snar/lit';
 import {PropertyValues, state} from 'snar';
 import {ActionValue, Progressable} from './action.js';
 import {saveToLocalStorage} from 'snar-save-to-local-storage';
-import {mp3Store} from '../mp3-store.js';
+import {Mp3Data, Mp3Item, mp3Store} from '../mp3-store.js';
+import toastit from 'toastit';
 
 const State = {
 	STOPPED: 'stopped',
@@ -11,6 +12,15 @@ const State = {
 } as const;
 
 type PlayerState = (typeof State)[keyof typeof State];
+
+type PickItemInformation = {
+	/** Project where the item belongs to */
+	project: Mp3Item;
+	/** Index of the item in the files list */
+	itemIndex: number;
+	/** Item value */
+	item: string;
+};
 
 @saveToLocalStorage('mp3:player')
 class PlayerController extends ReactiveController {
@@ -30,7 +40,10 @@ class PlayerController extends ReactiveController {
 		return this.state === State.STOPPED;
 	}
 
-	@state() directory: string | null = null;
+	@state() dirpath: string | null = null;
+
+	#projects: Mp3Data = [];
+	@state() playIndex = 1;
 
 	#getCurrentProgressableAction() {
 		return this.actions.find((a) => a.progress !== 1);
@@ -62,22 +75,92 @@ class PlayerController extends ReactiveController {
 		}
 	}
 
+	async firstUpdated() {
+		if (this.playing) {
+			this.pause();
+		}
+
+		if (this.paused) {
+			const items = (await this.loadProjects()) ?? [];
+			if (items.length === 0) {
+				toastit('No items to play');
+				this.stop();
+				return;
+			}
+		}
+	}
+
 	async run() {
 		while (this.playing) {
 			const action = this.#getCurrentProgressableAction();
 			if (!action) {
 				this.#resetProgress();
 			} else if (action.name === 'play') {
-				await 
-				console.log(action);
+				const info = this.getCurrentItemInfo()!;
+				info.project.index = info.itemIndex;
+				await mp3Store.playAudio(info.project);
+				action.progress = 1;
+			} else if (action.name === 'wait') {
+				await new Promise((r) => setTimeout(r, action.waitNumber * 1000));
+				action.progress = 1;
+			} else if (action.name === 'random') {
+				this.#randomPlayIndex();
+				action.progress = 1;
 			}
 			await new Promise((r) => setTimeout(r, 1000));
 		}
 	}
 
-	play() {
+	#randomPlayIndex() {
+		const total = this.#projects.flatMap((p) => p.files).length;
+		this.playIndex = Math.floor(Math.random() * total);
+	}
+
+	getCurrentItemInfo() {
+		return this.#getItemInfoAt(this.playIndex);
+	}
+
+	#getItemInfoAt(index: number): PickItemInformation | undefined {
+		let find: Mp3Item | undefined;
+		let info: PickItemInformation | undefined = undefined;
+		let acc = 0;
+		for (let project of this.#projects) {
+			const size = project.files.length;
+			const start = acc;
+			acc += size;
+			const end = acc - 1;
+			if (index >= start && index <= end) {
+				const itemIndex = index - start;
+				info = {
+					project,
+					itemIndex,
+					item: project.files[itemIndex],
+				};
+				info.project = project;
+				break;
+			}
+		}
+
+		return info;
+	}
+
+	async loadProjects() {
+		if (this.dirpath !== null) {
+			return (this.#projects = (await mp3Store.getTreeFromPath(
+				this.dirpath,
+				this.recursive
+			))!);
+		}
+	}
+
+	async play() {
 		if (this.stopped) {
-			this.directory = decodeURIComponent(mp3Store.cwd.join('/'));
+			this.dirpath = decodeURIComponent(mp3Store.cwd.join('/'));
+			const items = (await this.loadProjects()) ?? [];
+			if (items.length === 0) {
+				toastit('No items to play');
+				return;
+			}
 			this.state = 'playing';
 		}
 	}

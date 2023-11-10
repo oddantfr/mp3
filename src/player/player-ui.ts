@@ -170,7 +170,7 @@ export class PlayerUI extends LitElement {
 							: nothing}
 					</md-chip-set>
 					<div id="banner" ?invisible=${playerController.stopped}>
-						Playing from /${playerController.directory}
+						Playing from /${playerController.dirpath}
 					</div>
 				</form>
 
