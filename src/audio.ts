@@ -6,7 +6,7 @@ export interface Fraction {
 	total: number;
 }
 
-async function abortPlayingAudio() {
+export async function abortPlayingAudio() {
 	if (_playingAudio) {
 		_playingAudio.pause();
 		_playingAudio.currentTime = 0;
@@ -30,35 +30,52 @@ export function loadAudio(uri: string) {
 	});
 }
 
-export function playAudio(uri: string, rate: number, fraction?: Fraction): Promise<void> {
-	return new Promise(async (resolve, reject) => {
-		try {
-			await abortPlayingAudio();
-			const audio = await loadAudio(uri);
-			_playingAudio = audio;
-			audio.playbackRate = rate;
-			const duration = audio.duration * 1000; // convert to ms
-			let start: number, end: number;
-			if (!fraction) {
-				start = 0;
-				end = duration;
-			} else {
-				const division = duration / fraction.total;
-				start = division * (fraction.index - 1);
-				end = start + division;
-			}
-			start = start / 1000;
-			end = end / 1000;
-			audio.currentTime = start;
-			audio.ontimeupdate = () => {
-				if (audio.currentTime >= end) {
-					audio.pause();
+export function playAudio(
+	uri: string,
+	rate: number,
+	fraction?: Fraction
+): Promise<HTMLAudioElement> {
+	return new Promise(
+		async (resolve: (audio: HTMLAudioElement) => void, reject) => {
+			try {
+				await abortPlayingAudio();
+				const audio = await loadAudio(uri);
+				_playingAudio = audio;
+				audio.playbackRate = rate;
+				const duration = audio.duration * 1000; // convert to ms
+				let start: number, end: number;
+				if (!fraction) {
+					start = 0;
+					end = duration;
+				} else {
+					const division = duration / fraction.total;
+					start = division * (fraction.index - 1);
+					end = start + division;
 				}
-			};
-			audio.onended = () => resolve(audio);
-			audio.play();
-		} catch (err) {
-			reject(err);
+				start = start / 1000;
+				end = end / 1000;
+				audio.currentTime = start;
+				audio.ontimeupdate = () => {
+					if (audio.currentTime >= end) {
+						audio.pause();
+					}
+				};
+				audio.onpause = () => {
+					if (audio.currentTime === audio.duration) {
+						//
+					} else {
+						reject('The audio was intentionally paused.');
+					}
+				};
+				audio.onended = () => {
+					console.log('ended');
+					// Resolve unless it was aborted
+					resolve(audio);
+				};
+				audio.play();
+			} catch (err) {
+				reject(err);
+			}
 		}
-	});
+	);
 }

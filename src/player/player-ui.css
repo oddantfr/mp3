@@ -1,0 +1,25 @@
+md-dialog {
+	width: 500px;
+}
+
+form {
+	padding-bottom: 0;
+}
+
+#sequence-chip-set {
+	padding-left: 24px;
+}
+#sequence-chip-set md-filter-chip:first-of-type {
+	margin-left: -12px;
+}
+
+#banner {
+	background-color: var(--md-sys-color-outline-variant);
+	color: var(--md-sys-color-on-surface);
+	padding: 5px 12px;
+	margin: 24px -24px 0;
+	transition: opacity 200ms ease-out;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}

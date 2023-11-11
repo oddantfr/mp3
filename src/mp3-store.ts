@@ -35,6 +35,22 @@ class Mp3Store extends ReactiveController {
 		}
 	}
 
+	async firstUpdated() {
+		/**
+		 * Because mp3dir was saved in the localstorage we need to
+		 * reflect its state with the dynamic data.
+		 */
+		if (this.mp3dir) {
+			const dir = this.mp3dir;
+			const path = this.mp3dir.path.join('/');
+			await this.fetchComplete;
+			const project = this.data.find((item) => item.path.join('/') === path);
+			if (project) {
+				project.index = dir.index;
+			}
+		}
+	}
+
 	updateHash() {
 		window.location.hash = this.cwd.join('/');
 	}
@@ -51,11 +67,11 @@ class Mp3Store extends ReactiveController {
 		}
 	}
 
-	async playAudio(dir = this.mp3dir) {
+	async playAudio(dir = this.mp3dir, playbackRate = 1) {
 		if (dir) {
 			await playAudio(
 				`./files/${dir.path.join('/')}/${dir.files[dir.index]}`,
-				1
+				playbackRate
 			);
 		}
 	}

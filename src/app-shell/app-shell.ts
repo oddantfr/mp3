@@ -1,4 +1,4 @@
-import {LitElement, html} from 'lit';
+import {LitElement, html, nothing} from 'lit';
 import {customElement} from 'lit/decorators.js';
 import {withStyles} from 'lit-with-styles';
 import styles from './app-shell.css?inline';
@@ -7,11 +7,14 @@ import {mp3Store} from '../mp3-store.js';
 import {withController} from '@snar/lit';
 import {settingsDialog} from '../settings-dialog/settings-dialog.js';
 import {playerUI} from '../player/player-ui.js';
+import {playerController} from '../player/player-controller.js';
 
 @customElement('app-shell')
 @withStyles(styles)
 // @ts-ignore
 @withController(mp3Store)
+// @ts-ignore
+@withController(playerController)
 export class AppShell extends LitElement {
 	render() {
 		return html`
@@ -24,7 +27,13 @@ export class AppShell extends LitElement {
 				<div class="flex-1"></div>
 
 				<md-icon-button @click=${() => (playerUI.open = true)}>
-					<md-icon>play_arrow</md-icon>
+					${playerController.playing
+						? html`<md-icon>radio_button_checked</md-icon>`
+						: nothing}
+					${playerController.stopped ? html`<md-icon>play_circle</md-icon>` : nothing}
+					${playerController.paused
+						? html`<md-icon>motion_photos_paused</md-icon>`
+						: nothing}
 				</md-icon-button>
 
 				<md-icon-button @click=${() => (settingsDialog.open = true)}>

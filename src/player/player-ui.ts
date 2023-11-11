@@ -6,27 +6,14 @@ import {playerController} from './player-controller.js';
 import {withStyles} from 'lit-with-styles';
 import {materialConfirm, materialPrompt} from 'material-3-prompt-dialog';
 import {ActionDialog} from './action-dialog.js';
+import styles from './player-ui.css?inline';
 
 @customElement({name: 'player-ui', inject: true})
-@withStyles(css`
-	md-dialog {
-		width: 500px;
-	}
-	form {
-		padding-bottom: 0;
-	}
-	#banner {
-		background-color: var(--md-sys-color-primary);
-		color: var(--md-sys-color-on-primary);
-		padding: 5px 12px;
-		margin: 24px -24px 0;
-		transition: opacity 200ms ease-out;
-	}
-`)
+@withStyles(styles)
 // @ts-ignore
 @withController(playerController)
 export class PlayerUI extends LitElement {
-	@state() open = true;
+	@state() open = false;
 
 	render() {
 		return html`
@@ -67,7 +54,7 @@ export class PlayerUI extends LitElement {
 					>
 						${playerController.actions.length
 							? html`
-									<md-chip-set class="">
+									<md-chip-set id="sequence-chip-set">
 										${playerController.actions.map((action) => {
 											let label = '';
 											let icon: TemplateResult | string = '';
@@ -89,10 +76,10 @@ export class PlayerUI extends LitElement {
 											}
 
 											return html`
-												<md-input-chip
+												<md-filter-chip
 													label=${label}
-													elevated
 													removable
+													?selected=${action.progress === 1}
 													?disabled=${!playerController.stopped}
 													?inert=${!playerController.stopped}
 													@click=${async (event: Event) => {
@@ -119,13 +106,18 @@ export class PlayerUI extends LitElement {
 														} catch (e) {}
 													}}
 												>
-													${icon}
-													<!-- <md-circular-progress
-														slot="icon"
-														indeterminate
-														style="--md-circular-progress-size: 24px;"
-													></md-circular-progress> -->
-												</md-input-chip>
+													${action.progress !== undefined &&
+													action.progress >= 0 &&
+													action.progress < 1
+														? html`
+																<md-circular-progress
+																	slot="icon"
+																	value=${action.progress}
+																	style="--md-circular-progress-size: 20px;"
+																></md-circular-progress>
+														  `
+														: icon}
+												</md-filter-chip>
 											`;
 										})}
 									</md-chip-set>
@@ -169,6 +161,7 @@ export class PlayerUI extends LitElement {
 							  `
 							: nothing}
 					</md-chip-set>
+
 					<div id="banner" ?invisible=${playerController.stopped}>
 						Playing from /${playerController.dirpath}
 					</div>

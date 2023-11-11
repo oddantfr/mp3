@@ -4,6 +4,10 @@ import {ActionValue, Progressable} from './action.js';
 import {saveToLocalStorage} from 'snar-save-to-local-storage';
 import {Mp3Data, Mp3Item, mp3Store} from '../mp3-store.js';
 import toastit from 'toastit';
+import {ms} from '../utils.js';
+import {TICK} from '../constants.js';
+import {playerUI} from './player-ui.js';
+import {abortPlayingAudio} from '../audio.js';
 
 const State = {
 	STOPPED: 'stopped',
@@ -15,7 +19,7 @@ type PlayerState = (typeof State)[keyof typeof State];
 
 type PickItemInformation = {
 	/** Project where the item belongs to */
-	project: Mp3Item;
+	project?: Mp3Item;
 	/** Index of the item in the files list */
 	itemIndex: number;
 	/** Item value */
@@ -72,6 +76,9 @@ class PlayerController extends ReactiveController {
 			if (this.playing) {
 				this.run();
 			}
+			if (this.paused || this.stopped) {
+				abortPlayingAudio();
+			}
 		}
 	}
 
@@ -95,19 +102,71 @@ class PlayerController extends ReactiveController {
 			const action = this.#getCurrentProgressableAction();
 			if (!action) {
 				this.#resetProgress();
-			} else if (action.name === 'play') {
+				continue;
+			}
+			if (action.name === 'play') {
 				const info = this.getCurrentItemInfo()!;
+				if (info.project === undefined) {
+					throw new Error('Something went wrong.');
+				}
 				info.project.index = info.itemIndex;
-				await mp3Store.playAudio(info.project);
+				// Project object changed so we update the mp3 store
+				// to persist the current item index between refreshes.
+				mp3Store.requestUpdate();
+				try {
+					await mp3Store.playAudio(info.project, action.playbackRate);
+				} catch (e) {
+					// Was aborted. Make sure we leave the loop.
+					return;
+				}
 				action.progress = 1;
-			} else if (action.name === 'wait') {
-				await new Promise((r) => setTimeout(r, action.waitNumber * 1000));
-				action.progress = 1;
-			} else if (action.name === 'random') {
+			}
+			if (action.name === 'wait') {
+				const timeMs = ms(`${action.waitNumber}${action.waitUnit}`);
+				console.log(action, timeMs);
+				const pace = 1 / (timeMs / TICK);
+				if (action.progress === undefined) {
+					action.progress = 0;
+					this.touch();
+					await new Promise((r) => setTimeout(r, 500));
+				}
+				action.progress += pace;
+				// Make sure we don't go out of bound
+				// and also making it seems like it's 1 so
+				// the circular progress can catch up with this value.
+				if (action.progress >= 1) {
+					action.progress = 0.99999999;
+					this.touch();
+					setTimeout(() => {
+						if (!this.playing) {
+							return;
+						}
+						action.progress = 1;
+						this.touch();
+					}, 500);
+				}
+			}
+			if (action.name === 'random') {
 				this.#randomPlayIndex();
 				action.progress = 1;
 			}
-			await new Promise((r) => setTimeout(r, 1000));
+			if (action.name === 'next') {
+				this.playIndex++;
+				// Here we check if we are not out of bound
+				const info = this.getCurrentItemInfo()!;
+				if (info === undefined || info.project === undefined) {
+					if (action.loop) {
+						this.playIndex = 0;
+					} else {
+						toastit('All audios were played.');
+						this.stop();
+						return;
+					}
+				}
+				action.progress = 1;
+			}
+			this.touch();
+			await new Promise((r) => setTimeout(r, TICK));
 		}
 	}
 
@@ -121,7 +180,6 @@ class PlayerController extends ReactiveController {
 	}
 
 	#getItemInfoAt(index: number): PickItemInformation | undefined {
-		let find: Mp3Item | undefined;
 		let info: PickItemInformation | undefined = undefined;
 		let acc = 0;
 		for (let project of this.#projects) {
@@ -161,6 +219,9 @@ class PlayerController extends ReactiveController {
 				toastit('No items to play');
 				return;
 			}
+			// Initialize with the current item in the first project
+			// which is usually the project being opened atm.
+			this.playIndex = items[0].index;
 			this.state = 'playing';
 		}
 	}
@@ -179,6 +240,7 @@ class PlayerController extends ReactiveController {
 
 	stop() {
 		this.state = 'stopped';
+		this.#resetProgress();
 	}
 
 	togglePlay() {
