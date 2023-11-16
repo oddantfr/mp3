@@ -1,10 +1,10 @@
-import {LitElement, TemplateResult, css, html, nothing} from 'lit';
+import {LitElement, TemplateResult, html, nothing} from 'lit';
 import {state} from 'lit/decorators.js';
 import {customElement} from 'custom-element-decorator';
 import {withController} from '@snar/lit';
 import {playerController} from './player-controller.js';
 import {withStyles} from 'lit-with-styles';
-import {materialConfirm, materialPrompt} from 'material-3-prompt-dialog';
+import {materialConfirm} from 'material-3-prompt-dialog';
 import {ActionDialog} from './action-dialog.js';
 import styles from './player-ui.css?inline';
 

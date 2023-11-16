@@ -17,10 +17,9 @@ import {playerController} from '../player/player-controller.js';
 @withController(playerController)
 export class AppShell extends LitElement {
 	render() {
+		const path = decodeURIComponent(mp3Store.cwd.slice(0, -1).join('/'));
 		return html`
-			<div id="path" class="py-2 px-3">
-				/${decodeURIComponent(mp3Store.cwd.join('/'))}
-			</div>
+			<div id="path" class="py-2 px-3">/${path}${path ? '/' : ''}</div>
 			<header>
 				<span>${mp3Store.cwd[mp3Store.cwd.length - 1] ?? 'root'}</span>
 
@@ -30,7 +29,9 @@ export class AppShell extends LitElement {
 					${playerController.playing
 						? html`<md-icon>radio_button_checked</md-icon>`
 						: nothing}
-					${playerController.stopped ? html`<md-icon>play_circle</md-icon>` : nothing}
+					${playerController.stopped
+						? html`<md-icon>play_circle</md-icon>`
+						: nothing}
 					${playerController.paused
 						? html`<md-icon>motion_photos_paused</md-icon>`
 						: nothing}
@@ -65,7 +66,7 @@ export class AppShell extends LitElement {
 					})}
 				</md-list>
 
-				<md-divider inset></md-divider>
+				<md-divider></md-divider>
 
 				<div id="content" class="flex-1 relative">
 					<div
@@ -75,36 +76,53 @@ export class AppShell extends LitElement {
 						${mp3Store.mp3dir
 							? html`
 									<div style="">
-										<div class="flex items-center">
-											<md-icon-button
+										<div class="flex items-center relative -top-5">
+											<md-fab
 												touch-target="wrapper"
 												?disabled=${mp3Store.mp3dir?.index === 0}
+												?inert=${mp3Store.mp3dir?.index === 0}
 												@click=${() => mp3Store.previousAudioIndex()}
+												lowered
 											>
-												<md-icon>arrow_back</md-icon>
-											</md-icon-button>
-											${mp3Store.mp3dir?.files[mp3Store.mp3dir.index]}
-											<md-icon-button
+												<md-icon slot="icon">arrow_back</md-icon>
+											</md-fab>
+
+											<md-text-button
+												class="mx-2"
+												@click=${() => mp3Store.playAudio()}
+												>${mp3Store.mp3dir?.files[
+													mp3Store.mp3dir.index
+												]}</md-text-button
+											>
+
+											<md-fab
 												touch-target="wrapper"
 												?disabled=${mp3Store.mp3dir?.index ===
 												mp3Store.mp3dir.files.length - 1}
+												?inert=${mp3Store.mp3dir?.index ===
+												mp3Store.mp3dir.files.length - 1}
 												@click=${() => mp3Store.nextAudioIndex()}
+												lowered
 											>
-												<md-icon>arrow_forward</md-icon>
-											</md-icon-button>
+												<md-icon slot="icon">arrow_forward</md-icon>
+											</md-fab>
 										</div>
-										<md-icon-button
-											touch-target="wrapper"
-											@click=${() => mp3Store.playAudio()}
-										>
-											<md-icon>volume_up</md-icon>
-										</md-icon-button>
-										<md-icon-button
-											touch-target="wrapper"
-											@click=${() => mp3Store.pickRandomIndex()}
-										>
-											<md-icon>casino</md-icon>
-										</md-icon-button>
+
+										<div id="fab-actions">
+											<md-fab
+												touch-target="wrapper"
+												@click=${() => mp3Store.pickRandomIndex()}
+												size="small"
+											>
+												<md-icon slot="icon">casino</md-icon>
+											</md-fab>
+											<md-fab
+												touch-target="wrapper"
+												@click=${() => mp3Store.playAudio()}
+											>
+												<md-icon slot="icon">volume_up</md-icon>
+											</md-fab>
+										</div>
 									</div>
 							  `
 							: html`nope`}
