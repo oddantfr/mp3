@@ -12,7 +12,6 @@
 		"url": ""
 	},
 	"scripts": {
-		"preinstall": "node --no-warnings install/install.cjs",
 		"dev": "wireit",
 		"build-mp3": "wireit",
 		"build": "wireit"
