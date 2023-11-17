@@ -1,2 +1,1 @@
-- Add `pwa-asset generator` in package.json scripts block (`npm pkg set`)
-	- Make sure it doesn't override the installation (in `deps` block), might want to wait for the installation to finish here, or do it before the installation starts.
+- Should replace `audio.ts` with something like speech and better interval managment.

@@ -11,6 +11,29 @@
 	pointer-events: none;
 }
 
+h2,
+h3 {
+	font-weight: 400;
+}
+h4 {
+	font-size: 0.75rem;
+	font-weight: 500;
+	margin: 12px 0;
+}
+
+form {
+	padding-top: 16px;
+}
+
+form md-list-item {
+	--md-list-item-leading-space: 0;
+	--md-list-item-trailing-space: 0;
+}
+
+form md-slider {
+	width: 100%;
+}
+
 /* .flex {
 	display: flex;
 }
