@@ -13,11 +13,11 @@
 	},
 	"scripts": {
 		"dev": "wireit",
-		"build-mp3": "wireit",
+		"build:mp3": "wireit",
 		"build": "wireit"
 	},
 	"wireit": {
-		"build-mp3": {
+		"build:mp3": {
 			"command": "node ./scripts/build-mp3-data-file.cjs",
 			"files": [
 				"docs/files/**/*.mp3",
@@ -39,7 +39,7 @@
 				"!docs/files"
 			],
 			"dependencies": [
-				"build-mp3"
+				"build:mp3"
 			]
 		},
 		"dev": {
@@ -48,7 +48,7 @@
 				"node_modules/.vite"
 			],
 			"dependencies": [
-				"build-mp3"
+				"build:mp3"
 			]
 		}
 	},
